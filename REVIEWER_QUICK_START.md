@@ -1,6 +1,6 @@
 # Reviewer Quick Start
 
-This folder is a local copy of PR Review Agent V3.
+This folder is a local copy of the PR review tool.
 
 Use it when a reviewer wants to choose a GitHub repository, select an available pull request, run static analysis, run Xcode build/test checks when possible, run Gemini review, and post comments only after human approval.
 

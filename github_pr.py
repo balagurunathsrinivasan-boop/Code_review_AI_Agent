@@ -72,7 +72,7 @@ class PullRequestCheckout:
     source_repo: str
 
 
-class GitHubPRClientV3:
+class GitHubPRClient:
     def __init__(
         self,
         owner: str,
@@ -763,7 +763,7 @@ class GitHubPRClientV3:
         authenticated_url = self._authenticated_clone_url(clone_url)
 
         with tempfile.TemporaryDirectory(
-            prefix="pr-review-v3-",
+            prefix="pr-review--",
         ) as temp_dir:
             checkout_path = Path(temp_dir) / self.repo
 

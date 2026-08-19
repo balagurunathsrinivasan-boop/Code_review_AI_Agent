@@ -1,8 +1,8 @@
-# PR Review Agent V3 Documentation
+# PR Review Documentation
 
 Version: `2026-08-19.1`
 
-This document explains how to set up, configure, run, troubleshoot, and operate the V3 PR Review Agent.
+This document explains how to set up, configure, run, troubleshoot, and operate the PR review tool.
 
 ## One-Click Local Start
 
@@ -16,9 +16,9 @@ The launcher opens `.env` once on every run, waits for the reviewer to confirm t
 
 If required values are still blank or placeholders after the reviewer presses Enter, the launcher lists the missing values and stops instead of reopening `.env` repeatedly.
 
-## What V3 Does
+## What It Does
 
-V3 is a build-aware GitHub pull request review agent. It combines deterministic checks with AI semantic review, then asks for human approval before posting anything to GitHub.
+This is a build-aware GitHub pull request review tool. It combines deterministic checks with AI semantic review, then asks for human approval before posting anything to GitHub.
 
 The flow is:
 
@@ -41,7 +41,7 @@ GitHub repository
 
 ## Files
 
-The V3 package contains:
+The package contains:
 
 ```text
 main.py
@@ -87,7 +87,7 @@ Responsibilities:
 - Post inline PR comments
 - Post or update detailed summary comments
 - Post or update final closing PR comments
-- Detect existing V3 inline comment markers
+- Detect existing inline comment markers
 
 ### `review_models.py`
 
@@ -137,7 +137,7 @@ Responsibilities:
 
 ## Requirements
 
-Install Python packages used by V3:
+Install Python packages used by the review tool:
 
 ```bash
 pip install requests pydantic google-genai
@@ -160,13 +160,13 @@ Xcode
 xcodebuild
 ```
 
-Before running `xcodebuild`, V3 asks the reviewer whether build/test validation should run. This is useful when the reviewer does not yet have a valid provisioning profile. If the reviewer skips it, V3 continues with static + Gemini review.
+Before running `xcodebuild`, the tool asks the reviewer whether build/test validation should run. This is useful when the reviewer does not yet have a valid provisioning profile. If the reviewer skips it, continues with static + Gemini review.
 
-If `xcodebuild` is unavailable, V3 also skips build/test analysis and continues with static + Gemini review.
+If `xcodebuild` is unavailable, the tool also skips build/test analysis and continues with static + Gemini review.
 
 ## GitHub Token
 
-V3 reads the token from:
+reads the token from:
 
 ```text
 GITHUB_TOKEN
@@ -195,7 +195,7 @@ Do not paste real tokens into chat, source code, screenshots, commits, or Markdo
 
 ## Gemini API Key
 
-V3 reads the Gemini key from:
+reads the Gemini key from:
 
 ```text
 GEMINI_API_KEY
@@ -215,7 +215,7 @@ GEMINI_MODEL=your-model-name
 
 ## `.env` Setup
 
-V3 has a built-in `.env` loader. You do not need `python-dotenv`.
+has a built-in `.env` loader. You do not need `python-dotenv`.
 
 Create `.env` in the same folder as `main.py`.
 
@@ -281,7 +281,7 @@ GITHUB_OWNER
 GITHUB_REPO
 ```
 
-If these are blank, V3 tries to infer the repo from:
+If these are blank, the tool tries to infer the repo from:
 
 ```bash
 git config --get remote.origin.url
@@ -358,7 +358,7 @@ GITHUB_API_VERSION=2022-11-28
 MAX_INLINE_COMMENTS=20
 ```
 
-Limits how many inline comments V3 posts in one run.
+Limits how many inline comments the tool posts in one run.
 
 ### Local Report Output Folder
 
@@ -366,7 +366,7 @@ Limits how many inline comments V3 posts in one run.
 REVIEW_OUTPUT_DIR=review_outputs
 ```
 
-After every completed review, V3 writes:
+After every completed review, the tool writes:
 
 ```text
 review_outputs/pr-<number>-<title>-<timestamp>.json
@@ -375,7 +375,7 @@ review_outputs/pr-<number>-<title>-<timestamp>.md
 
 ### Xcode Settings
 
-V3 asks before running xcodebuild. The settings below are used only when the reviewer chooses to run xcodebuild validation.
+asks before running xcodebuild. The settings below are used only when the reviewer chooses to run xcodebuild validation.
 
 ```text
 XCODEBUILD_TIMEOUT_SECONDS=1800
@@ -420,9 +420,7 @@ Add extra `xcodebuild` arguments:
 XCODEBUILD_EXTRA_ARGS=-configuration Debug
 ```
 
-## Running V3
-
-From the folder containing the V3 files:
+## Running The ReviewFrom the folder containing the files:
 
 ```bash
 python main.py
@@ -432,16 +430,16 @@ Expected startup:
 
 ```text
 ========================================================================
-                         STARTING V3 PR REVIEW
+                         STARTING PR REVIEW
 ========================================================================
-V3 script version: 2026-08-19.1
+script version: 2026-08-19.1
 ```
 
 If you do not see the version line, your local `main.py` is not the latest copy.
 
 ## PR Picker
 
-If `PULL_REQUEST_NUMBER` is blank, V3 lists PRs:
+If `PULL_REQUEST_NUMBER` is blank, the tool lists PRs:
 
 ```text
 Open pull requests for owner/repo:
@@ -466,7 +464,7 @@ or:
 
 ## No PR Available
 
-If no PR is found, V3 now stops gracefully:
+If no PR is found, the tool stops gracefully:
 
 ```text
 No open pull requests found for owner/repo.
@@ -497,7 +495,7 @@ PR_LIST_STATE=closed
 
 ### 1. Static Analysis
 
-V3 reads changed files from the PR head SHA and runs deterministic checks only against diff-valid lines where possible.
+reads changed files from the PR head SHA and runs deterministic checks only against diff-valid lines where possible.
 
 Example output:
 
@@ -509,7 +507,7 @@ Static analysis: Sources/ProfileViewModel.swift
 
 ### 2. Xcode Build/Test Analysis
 
-V3 clones the PR head SHA into a temporary folder.
+clones the PR head SHA into a temporary folder.
 
 Then it:
 
@@ -555,11 +553,11 @@ Gemini focuses on reasoning-heavy issues:
 
 Findings from static analysis, Xcode, and Gemini are merged.
 
-V3 deduplicates findings that point to the same file/line and similar title/category.
+deduplicates findings that point to the same file/line and similar title/category.
 
 ### 5. Save Local Artifacts
 
-Before GitHub posting, V3 saves:
+Before GitHub posting, the tool saves:
 
 ```text
 JSON report
@@ -576,7 +574,7 @@ These are useful for:
 
 ### 6. Human Approval
 
-V3 asks:
+asks:
 
 ```text
 Human approval required before posting to GitHub.
@@ -636,7 +634,7 @@ These markers help detect duplicate comments.
 
 ## Duplicate Inline Comments
 
-If duplicate inline comments are found, it asks:
+If duplicate inline comments are found, itThe tool asks:
 
 ```text
 Found 2 duplicate inline comment(s) that were already posted on this PR.
@@ -693,7 +691,7 @@ github_pr.py
 If they get out of sync, you may see errors like:
 
 ```text
-TypeError: GitHubPRClientV3.list_open_pull_requests() got an unexpected keyword argument 'state'
+TypeError: GitHubPRClient.list_open_pull_requests() got an unexpected keyword argument 'state'
 ```
 
 That means:
@@ -715,13 +713,13 @@ The final `.` means "copy into the current folder".
 Verify:
 
 ```bash
-grep -n "V3_SCRIPT_VERSION" main.py
+grep -n "SCRIPT_VERSION" main.py
 ```
 
 Expected:
 
 ```text
-V3_SCRIPT_VERSION = "2026-08-19.1"
+SCRIPT_VERSION = "2026-08-19.1"
 ```
 
 ## `.gitignore`
@@ -947,7 +945,7 @@ open -a TextEdit .env
 Check script version:
 
 ```bash
-grep -n "V3_SCRIPT_VERSION" main.py
+grep -n "SCRIPT_VERSION" main.py
 ```
 
 Check Git remote:

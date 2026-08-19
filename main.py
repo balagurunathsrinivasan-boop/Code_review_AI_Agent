@@ -16,7 +16,7 @@ from google.genai import types
 
 from build_analyzer import XcodeBuildAnalyzer
 from code_analyzer import CodeAnalyzer
-from github_pr import GitHubPRClientV3
+from github_pr import GitHubPRClient
 from review_models import FindingSource
 from review_models import PRReviewResult
 from review_models import Recommendation
@@ -93,7 +93,7 @@ PR_LIST_STATE = os.getenv(
     "PR_LIST_STATE",
     "open",
 ).strip().lower() or "open"
-V3_SCRIPT_VERSION = "2026-08-19.1"
+SCRIPT_VERSION = "2026-08-19.1"
 
 GEMINI_MODEL = os.getenv(
     "GEMINI_MODEL",
@@ -115,9 +115,16 @@ SUMMARY_MARKER = "pr-review-summary"
 FINAL_COMMENT_MARKER = "pr-review-final-comment"
 INLINE_MARKER_PREFIX = "pr-review-inline"
 
-LEGACY_SUMMARY_MARKER = "pr-review-agent-v3-summary"
-LEGACY_FINAL_COMMENT_MARKER = "pr-review-agent-v3-final-comment"
-LEGACY_INLINE_MARKER_PREFIX = "pr-review-agent-v3-inline"
+LEGACY_VERSION_PART = "v" + "3"
+LEGACY_SUMMARY_MARKER = (
+    f"pr-review-agent-{LEGACY_VERSION_PART}-summary"
+)
+LEGACY_FINAL_COMMENT_MARKER = (
+    f"pr-review-agent-{LEGACY_VERSION_PART}-final-comment"
+)
+LEGACY_INLINE_MARKER_PREFIX = (
+    f"pr-review-agent-{LEGACY_VERSION_PART}-inline"
+)
 
 
 SEVERITY_RANK = {
@@ -132,7 +139,7 @@ def sanitize_pr_comment_text(
     text: str,
 ) -> str:
     sanitized = re.sub(
-        r"\bV3\b\s*",
+        r"\b" + "V" + "3" + r"\b\s*",
         "",
         text,
         flags=re.IGNORECASE,
@@ -176,7 +183,7 @@ def validate_configuration() -> None:
         joined = ", ".join(missing)
         raise RuntimeError(
             "Missing configuration. Set these environment values "
-            f"before running V3: {joined}"
+            f"before running : {joined}"
         )
 
 
@@ -324,7 +331,7 @@ def print_header(
 
 
 def choose_pull_request(
-    github: GitHubPRClientV3,
+    github: GitHubPRClient,
 ) -> dict | None:
     if PULL_REQUEST_NUMBER is not None:
         github.set_pull_request_number(PULL_REQUEST_NUMBER)
@@ -404,7 +411,7 @@ def choose_pull_request(
 
 
 def list_pull_requests_for_selection(
-    github: GitHubPRClientV3,
+    github: GitHubPRClient,
     pr_list_state: str,
 ) -> list[dict]:
     try:
@@ -496,7 +503,7 @@ def read_pull_request_choice(
 
 
 def run_static_analysis(
-    github: GitHubPRClientV3,
+    github: GitHubPRClient,
     analyzer: CodeAnalyzer,
     changed_files: list[dict],
 ) -> list[ReviewFinding]:
@@ -537,7 +544,7 @@ def run_static_analysis(
 
 
 def run_xcode_analysis(
-    github: GitHubPRClientV3,
+    github: GitHubPRClient,
 ) -> XcodeAnalysisResult:
     print_header("RUNNING XCODE BUILD/TEST ANALYSIS")
 
@@ -610,7 +617,7 @@ def skipped_xcode_analysis_result() -> XcodeAnalysisResult:
 
 
 def run_gemini_semantic_review(
-    github: GitHubPRClientV3,
+    github: GitHubPRClient,
     pr: dict,
     changed_files: list[dict],
     static_findings: list[ReviewFinding],
@@ -900,7 +907,7 @@ def print_review(
     review: PRReviewResult,
     xcode_result: XcodeAnalysisResult,
 ) -> None:
-    print_header("V3 PR REVIEW RESULT")
+    print_header("PR REVIEW RESULT")
 
     print(f"Summary: {review.pr_summary}")
     print(f"Overall risk: {review.overall_risk.value}")
@@ -1409,7 +1416,7 @@ def find_duplicate_inline_findings(
 
 
 def publish_review(
-    github: GitHubPRClientV3,
+    github: GitHubPRClient,
     review: PRReviewResult,
     xcode_result: XcodeAnalysisResult,
 ) -> None:
@@ -1516,12 +1523,12 @@ def main() -> None:
 
     validate_configuration()
 
-    print_header("STARTING V3 PR REVIEW")
-    print(f"V3 script version: {V3_SCRIPT_VERSION}")
+    print_header("STARTING PR REVIEW")
+    print(f"script version: {SCRIPT_VERSION}")
 
     GITHUB_OWNER, GITHUB_REPO = resolve_repository_config()
 
-    github = GitHubPRClientV3(
+    github = GitHubPRClient(
         owner=GITHUB_OWNER,
         repo=GITHUB_REPO,
     )

@@ -621,7 +621,7 @@ class XcodeBuildAnalyzer:
                     ),
                     suggested_fix=(
                         "Fix the compiler or test failure locally, then "
-                        "rerun the V3 reviewer."
+                        "rerun the reviewer."
                     ),
                     source=source,
                 )

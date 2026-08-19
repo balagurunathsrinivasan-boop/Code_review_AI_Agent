@@ -3,7 +3,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-echo "Setting up PR Review Agent V3 local reviewer copy..."
+echo "Setting up PR Review Agent local reviewer copy..."
 
 if ! command -v python3 >/dev/null 2>&1; then
   echo "Python 3 is required. Install Python 3.10 or newer, then run this again."

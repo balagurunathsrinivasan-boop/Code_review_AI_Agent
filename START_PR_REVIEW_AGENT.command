@@ -111,7 +111,7 @@ ask_reviewer_to_review_env() {
 
 clear
 print_line
-echo "             PR Review Agent V3 - One Click Launcher"
+echo "             PR Review - One Click Launcher"
 print_line
 echo
 
